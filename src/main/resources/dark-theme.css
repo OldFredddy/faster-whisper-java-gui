@@ -1,0 +1,107 @@
+.root {
+    -fx-base: #202225;
+    -fx-background: #36393F;
+    -fx-control-inner-background: #202225;
+    -fx-accent: #4E5D94;
+    -fx-focus-color: #4E5D94;
+    -fx-faint-focus-color: #20222522;
+}
+
+.label {
+    -fx-text-fill: #FFFFFF;
+
+}
+
+.button {
+    -fx-background-color: #4E5D94, linear-gradient(#5C6975 0%, #5C6975 20%, #414C56 100%);
+    -fx-background-insets: 0, 1;
+    -fx-background-radius: 4px;
+    -fx-padding: 5px 10px;
+    -fx-text-fill: #FFFFFF;
+
+}
+
+.button:hover {
+    -fx-background-color: #5C6975, linear-gradient(#6B7887 0%, #6B7887 20%, #526172 100%);
+}
+
+.text-area {
+    -fx-background-color: #2C2F33;
+    -fx-text-fill: #FFFFFF;
+    -fx-border-color: #4E5D94;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.menu-bar {
+    -fx-background-color: #4E5D94;
+    -fx-text-fill: #FFFFFF;
+}
+
+.menu {
+    -fx-background-color: #4E5D94;
+    -fx-text-fill: #FFFFFF;
+}
+
+.context-menu {
+    -fx-background-color: #4E5D94;
+    -fx-text-fill: #FFFFFF;
+}
+
+.menu-item {
+    -fx-text-fill: #FFFFFF;
+}
+
+.menu-item:focused {
+    -fx-background-color: #5C6975;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 4px;
+}
+
+.scroll-bar {
+    -fx-background-color: #2C2F33;
+    -fx-background-insets: 1;
+    -fx-background-radius: 4px;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #4E5D94;
+    -fx-background-insets: 1;
+    -fx-background-radius: 4px;
+}
+
+.list-view {
+    -fx-background-color: #2C2F33;
+    -fx-border-color: #4E5D94;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.combo-box {
+    -fx-background-color: #2C2F33;
+    -fx-text-fill: #FFFFFF;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #FFFFFF;
+    -fx-background-color: #2C2F33;
+}
+
+.combo-box .list-cell:filled:selected, .combo-box .list-cell:filled:selected:hover {
+    -fx-background-color: #4E5D94;
+    -fx-text-fill: #FFFFFF;
+}
+
+.progress-bar {
+    -fx-accent: #4E5D94;
+}
+
+.progress-indicator {
+    -fx-accent: #4E5D94;
+}
+
+/* Добавьте подобные стили для других элементов, которые вы используете в своем интерфейсе. */

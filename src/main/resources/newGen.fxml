@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright (c) 2015, 2019, Gluon and/or its affiliates.
+  All rights reserved. Use is subject to license terms.
+
+  This file is available and licensed under the following license:
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+
+  - Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+  - Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in
+    the documentation and/or other materials provided with the distribution.
+  - Neither the name of Oracle Corporation nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+  DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox fx:id="vbMenu" prefHeight="782.0" prefWidth="883.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
+  <children>
+    <MenuBar prefHeight="0.0" prefWidth="883.0" VBox.vgrow="NEVER">
+      <menus>
+        <Menu fx:id="menuOpenFile" mnemonicParsing="false" text="Файл">
+          <items>
+            <MenuItem fx:id="menuOpenDec" mnemonicParsing="false" text="Изменить каталог для подхвата .wav вручную" />
+            <MenuItem fx:id="menuOpenTable" mnemonicParsing="false" text="Изменить стандартный каталог сохраниния результатов" visible="false" />
+                  <MenuItem fx:id="menuSaveResult" mnemonicParsing="false" text="Указать путь к модели языка" visible="false" />
+          </items>
+        </Menu>
+        <Menu fx:id="menuHelp" mnemonicParsing="false" text="Справка" visible="false" />
+      </menus>
+    </MenuBar>
+    <SplitPane fx:id="superParentPane" focusTraversable="true" prefHeight="763.0" prefWidth="883.0" VBox.vgrow="ALWAYS">
+      <items>
+        <ScrollPane fx:id="parentPane" prefHeight="607.0" prefWidth="881.0">
+          <content>
+            <AnchorPane id="Content" fx:id="myPane" minHeight="-1.0" minWidth="-1.0" prefHeight="694.0" prefWidth="879.0">
+              <children>
+                        <TextArea fx:id="IsxTA" layoutX="437.0" layoutY="38.0" prefHeight="676.0" prefWidth="437.0" text="Сделано в войсковой части 90099" wrapText="true">
+                           <font>
+                              <Font name="Times New Roman" size="16.0" />
+                           </font>
+                        </TextArea>
+                        <Button fx:id="DecButton" disable="true" layoutX="171.0" layoutY="199.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="Старт" />
+                        <Label fx:id="LabelPervious" layoutX="560.0" prefHeight="41.0" prefWidth="190.0" text="Область предпросмотра">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </Label>
+                        <CheckBox fx:id="CheckBox1" layoutX="60.0" layoutY="58.0" mnemonicParsing="false" prefHeight="117.0" prefWidth="284.0" text="Увеличить быстродействие &#10;(требуется большее количество оперативной памяти)" textAlignment="CENTER" visible="false" wrapText="true">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </CheckBox>
+                        <ProgressBar fx:id="ProgressBarMainStage" layoutX="2.0" layoutY="715.0" prefHeight="37.0" prefWidth="877.0" progress="0.0" />
+                        <ListView fx:id="ListOfFiles" layoutX="3.0" layoutY="245.0" prefHeight="469.0" prefWidth="432.0" />
+                        <ProgressIndicator fx:id="ProgressBarInd1" layoutX="290.0" layoutY="38.0" progress="0.0" visible="false" />
+                        <Button fx:id="StopButton1" layoutX="217.0" layoutY="166.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="114.0" text="Принудительное завершение" textAlignment="CENTER" visible="false" wrapText="true" />
+                        <Button fx:id="RefreshButton" graphicTextGap="1.0" layoutX="17.0" layoutY="206.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="111.0" text="Обновить каталог" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                        <ComboBox fx:id="cbSelectLang" layoutX="17.0" layoutY="40.0" prefHeight="25.0" prefWidth="179.0" promptText="Английский" />
+                        <ComboBox fx:id="cbSelectModelSize" layoutX="240.0" layoutY="40.0" prefHeight="25.0" prefWidth="179.0" promptText="small" />
+                        <ComboBox fx:id="cbSelectDevice" layoutX="17.0" layoutY="122.0" prefHeight="25.0" prefWidth="179.0" promptText="cpu" />
+                        <ComboBox fx:id="cbSelectDurationFilter" layoutX="239.0" layoutY="122.0" prefHeight="25.0" prefWidth="179.0" promptText="5" />
+                        <Button fx:id="setDefaultSettingsButton" graphicTextGap="1.0" layoutX="77.0" layoutY="199.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="set Default Settings" textAlignment="CENTER" visible="false" wrapText="true">
+                           <font>
+                              <Font size="10.0" />
+                           </font>
+                        </Button>
+                        <Label fx:id="LabelPervious1" layoutX="234.0" layoutY="66.0" prefHeight="63.0" prefWidth="190.0" text="Фильтровать записи короче чем [секунды]" textAlignment="CENTER" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="LabelPervious2" layoutX="55.0" layoutY="6.0" prefHeight="25.0" prefWidth="106.0" text="Выбор языка">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="LabelPervious21" layoutX="273.0" layoutY="2.0" prefHeight="32.0" prefWidth="115.0" text="Размер модели">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="LabelPervious22" layoutX="67.0" layoutY="89.0" prefHeight="25.0" prefWidth="73.0" text="CPU/GPU">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <CheckBox fx:id="allowServiceMessages" layoutX="287.0" layoutY="193.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="114.0" text="Показывать сервисную информацию в выводе" wrapText="true">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="allowCopyFile" layoutX="287.0" layoutY="218.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text=".wav -&gt; /txt" wrapText="true">
+                           <font>
+                              <Font size="8.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="allowPakReverseBytes" layoutX="24.0" layoutY="162.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="225.0" text="Реверс байт у .pak файлов" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="allowPakReverseFrames" layoutX="260.0" layoutY="162.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Реверс кадров" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+              </children>
+            </AnchorPane>
+          </content>
+        </ScrollPane>
+      </items>
+    </SplitPane>
+  </children>
+</VBox>
