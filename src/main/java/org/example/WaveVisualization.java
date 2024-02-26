@@ -34,7 +34,7 @@ public class WaveVisualization extends WaveFormPane {
 	 * @param width
 	 * @param height
 	 */
-	public WaveVisualization(int width, int height,double WavLen1,WavPlayer rec, Controller contr) {
+	public WaveVisualization(int width, int height, double WavLen1, WavPlayer rec, Controller contr) {
 		super(width, height);
 		super.setWaveVisualization(this);
 		this.rec=rec;
@@ -43,7 +43,6 @@ public class WaveVisualization extends WaveFormPane {
 		TimerIncrement=width/temp/8.92;
 		waveService = new WaveFormService(this);
 		animationService = new PaintService();
-		
 		// ----------
 		widthProperty().addListener((observable , oldValue , newValue) -> {
 			//System.out.println("New Visualizer Width is:" + newValue);
@@ -83,7 +82,6 @@ public class WaveVisualization extends WaveFormPane {
 				t1=WavLengthInSec2*(int)m.getX()/this.width; //для передачи в CtrlRecService
 			}
 		});
-
 		setOnMouseDragged(m->{
 			this.setMouseXPosition((int) m.getX());
 			this.setTimerEndPosition((int)m.getX());

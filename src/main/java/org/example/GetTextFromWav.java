@@ -31,7 +31,8 @@ public static double progress;
         this.contr=contr;
     }
     public List<String>startWhisper(Path pathToFile, String device, String model,
-                                    String language, boolean allowServiceMessages, long filterLength) throws UnsupportedAudioFileException, IOException, InterruptedException {
+                                    String language, boolean allowServiceMessages,
+                                    long filterLength, boolean isTargetLang) throws UnsupportedAudioFileException, IOException, InterruptedException {
         uuid = UUID.randomUUID();
         int SampleRate;
         File file = new File(pathToFile.toUri());
@@ -57,14 +58,13 @@ public static double progress;
             pathToFile = Paths.get(newPath);
         }
         String readyFilePath = Whisper.recognize(t2, contr, pathToFile.toString(),
-                language, model, device, fileForGetFilename, allowServiceMessages);
+                language, model, device, fileForGetFilename, allowServiceMessages, isTargetLang);
         List<String> temp = readFileLines(readyFilePath);
         if (readyFilePath.equals("Пропуск файла, превышен timeout ожидания")
                 ||readyFilePath.equals("File can't be created.")){
             temp.add(readyFilePath);
             return temp;
         }
-
         File fileForDelete = new File(readyFilePath);
         fileForDelete.delete();
         file.delete();

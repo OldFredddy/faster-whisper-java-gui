@@ -23,44 +23,51 @@ public class StartAutoRecognize
 
     public void startRec(List <String> waveFilesAbsPath, String language, String device, String smodel,
                          boolean allowServiseMessages, long duratinFilter,
-                         boolean allowCopyWav) throws UnsupportedAudioFileException, IOException, InterruptedException {
+                         boolean allowCopyWav, boolean isTargetLang) throws UnsupportedAudioFileException, IOException, InterruptedException {
         GetTextFromWav getTextFromWav=new GetTextFromWav(this.contr);
         for (int i = 0; i < waveFilesAbsPath.size(); i++) {
                 CreateTxtWithText(getTextFromWav.startWhisper(Paths.get(Controller.waveFilesAbsPath.get(i)),
-                                device,smodel, language,allowServiseMessages, duratinFilter),
-                                String.valueOf(Controller.waveFilesAbsPath.get(i)), allowCopyWav);
+                                device,smodel, language,allowServiseMessages, duratinFilter, isTargetLang),
+                                String.valueOf(Controller.waveFilesAbsPath.get(i)), allowCopyWav,isTargetLang, language);
         }
     }
-    public  void CreateTxtWithText(List<String> temp, String nameFile, boolean allowCopyWav) {
+    public void CreateTxtWithText(List<String> temp, String nameFile, boolean allowCopyWav, boolean isTargetLang, String language) {
         try {
-            if (temp.get(0).equals("Файл меньше заданного фильтра длительности!")||
-                    temp.get(0).equals("File can't be created.")||temp.get(0).equals("Пропуск файла, превышен timeout ожидания") ){
+            if (temp.get(0).equals("Файл меньше заданного фильтра длительности!") ||
+                    temp.get(0).equals("File can't be created.") || temp.get(0).equals("Пропуск файла, превышен timeout ожидания")) {
                 contr.setToTextArea(temp.get(0));
                 return;
             }
             Path name = Paths.get(nameFile);
-            nameFile=name.getFileName().toString();
-            FileOutputStream fos = new FileOutputStream(Controller.txtDirPath +"/"+nameFile+".txt");
+            nameFile = name.getFileName().toString();
+
+            // Определение суффикса на основе выбранного языка или использование _en для английского
+            String languageSuffix = isTargetLang ? "_" + language.toLowerCase() : "_en"; // Предполагается, что метод contr.getLanguage() возвращает код выбранного языка
+            // Изменение имени файла для включения суффикса языка
+            String fileNameWithLanguage = nameFile.substring(0, nameFile.lastIndexOf('.')) + languageSuffix + ".txt";
+
+            FileOutputStream fos = new FileOutputStream(Controller.txtDirPath + "/" + fileNameWithLanguage);
             OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             BufferedWriter bw = new BufferedWriter(osw);
             for (int i = 0; i < temp.size(); i++) {
-                if(temp.get(i).length()>0){
-                    bw.write(temp.get(i)+"\n");}
+                if (temp.get(i).length() > 0) {
+                    bw.write(temp.get(i) + "\n");
+                }
             }
             bw.close();
 
-            Path sourseFilePath= name;
+            Path sourceFilePath = name;
             Path destinationPath = Paths.get("txt");
-            if (allowCopyWav){
-                moveFileToDirectory(sourseFilePath);
+            if (allowCopyWav) {
+                moveFileToDirectory(sourceFilePath);
             }
-            contr.setToTextArea("\n Обработка файла завершена "+nameFile);
-        } catch (IOException | IndexOutOfBoundsException var7  ) {
+            contr.setToTextArea("\n Обработка файла завершена " + fileNameWithLanguage);
+        } catch (IOException | IndexOutOfBoundsException var7) {
             var7.printStackTrace();
-            contr.setToTextArea("\n Не могу ничего разобрать в этом файле!"+nameFile);
-            return;
+            contr.setToTextArea("\n Не могу ничего разобрать в этом файле!" + nameFile);
         }
     }
+
     public static void moveFileToDirectory(Path sourceFilePath) {
         try {
             // Определение директории, где находится JAR

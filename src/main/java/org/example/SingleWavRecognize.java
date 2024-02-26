@@ -18,6 +18,6 @@ public class SingleWavRecognize {
     public void Recognize() throws UnsupportedAudioFileException, IOException, InterruptedException {
         GetTextFromWav getTextFromWav=new GetTextFromWav(this.contr);
         getTextFromWav.startWhisper(Paths.get(PathToTempWav), contr.whisperDevice,
-                contr.whisperModelSize, contr.whisperLanguage, allowServiceMessages,durationFilter);
+                contr.whisperModelSize, contr.whisperLanguage, allowServiceMessages,durationFilter, true);
     }
 }

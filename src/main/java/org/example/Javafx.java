@@ -19,7 +19,7 @@ private static Scene scene;
 
 @Override
     public void start(Stage stage) throws Exception{
-        scene=new Scene(loadFXML("/newGen"),883,782);
+        scene=new Scene(loadFXML("/newGen"),1329,828);
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(c -> System.exit(0));

@@ -34,8 +34,8 @@ import javafx.stage.FileChooser;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class Controller {
-    public  ObservableList<String> waveFiles = FXCollections.observableArrayList();
-    public static List<String> waveFilesAbsPath =new ArrayList<String>();
+    public ObservableList<String> waveFiles = FXCollections.observableArrayList();
+    public static List<String> waveFilesAbsPath = new ArrayList<String>();
     FileChooser fileChooser = new FileChooser();
     DirectoryChooser directoryChooser = new DirectoryChooser();
 
@@ -50,7 +50,8 @@ public class Controller {
 
     @FXML
     private TextArea IsxTA;
-
+    @FXML
+    private TextArea originalLangTF;
     @FXML
     private Label LabelLang;
 
@@ -112,15 +113,18 @@ public class Controller {
     public String whisperLanguage;
     public String whisperDevice;
     public String whisperModelSize;
-
+    @FXML
+    private CheckBox saveOriginalFlag;
     @FXML
     private CheckBox allowPakReverseBytes;
 
     public boolean allowCopyWav;
     private List<String> languages = new ArrayList<>();
     private Map<String, String> languageMap = new HashMap<>();
-    private boolean decButtonStopFlag=false;
+    private boolean decButtonStopFlag = false;
     private Service<Void> service2;
+    private Service<Void> service3;
+
     @FXML
     void initialize() throws IOException, URISyntaxException {
         directoryChooser.setTitle("Выберите папку");
@@ -137,9 +141,10 @@ public class Controller {
         cbSelectModelSize.getItems().add("base");
         cbSelectModelSize.getItems().add("tiny");
         cbSelectDurationFilter.setValue("5");
-        whisperDevice="cpu";
-        whisperModelSize="small";
+        whisperDevice = "cpu";
+        whisperModelSize = "small";
         allowServiceMessages.setSelected(false);
+
         whisperLanguage = languageMap.entrySet().stream()
                 .filter(entry -> "Автоопределение".equals(entry.getValue()))
                 .map(Map.Entry::getKey)
@@ -151,36 +156,41 @@ public class Controller {
                     .map(Map.Entry::getKey)
                     .findFirst().orElse(null);
         });
-        cbSelectDevice.setOnAction(e->{
-            whisperDevice=cbSelectDevice.getValue();
+        cbSelectDevice.setOnAction(e -> {
+            whisperDevice = cbSelectDevice.getValue();
             DecButton.setDisable(false);
         });
-        cbSelectModelSize.setOnAction(e->{
-            whisperModelSize=cbSelectModelSize.getValue();
+        cbSelectModelSize.setOnAction(e -> {
+            whisperModelSize = cbSelectModelSize.getValue();
         });
-         RefreshButton.setOnAction(event->{
-             try {
-                 getListWave("Basic");
-             } catch (URISyntaxException e) {
-                 throw new RuntimeException(e);
-             }
-         });
-         setDefaultSettingsButton.setOnAction(e->{
-             cbSelectDevice.setValue("cpu");
-             cbSelectLang.setValue("Английский");
-             cbSelectModelSize.setValue("small");
-             cbSelectDurationFilter.setValue("5");
-             DecButton.setDisable(false);
-         });
+        RefreshButton.setOnAction(event -> {
+            try {
+                getListWave("Basic");
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        setDefaultSettingsButton.setOnAction(e -> {
+            cbSelectDevice.setValue("cpu");
+            cbSelectLang.setValue("Английский");
+            cbSelectModelSize.setValue("small");
+            cbSelectDurationFilter.setValue("5");
+            DecButton.setDisable(false);
+        });
         DecButton.setOnAction(event -> {
             if (!decButtonStopFlag) {
-                service2 = createNewService(); // Метод для создания нового сервиса
+                service2 = createNewService(true); // Метод для создания нового сервиса
                 service2.start();
                 IsxTA.clear();
+                if (saveOriginalFlag.isSelected()) {
+                    service3 = createNewService(false); // Метод для создания нового сервиса
+                    service3.start();
+                    originalLangTF.clear();
+                }
             } else {
                 service2.cancel();
             }
-                });
+        });
 
 
         menuOpenDec.setOnAction(event -> {
@@ -194,15 +204,15 @@ public class Controller {
         ListOfFiles.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent mouseEvent) {
-                if(mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+                if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
                     if (mouseEvent.getClickCount() == 2) {
-                        rec = new WavPlayer(waveFilesAbsPath.get(ListOfFiles.getSelectionModel().getSelectedIndex()),Controller.this);
-                        Riffer rif1=new Riffer(rec.getDurationInSeconds(),rec,Controller.this);
+                        rec = new WavPlayer(waveFilesAbsPath.get(ListOfFiles.getSelectionModel().getSelectedIndex()), Controller.this);
+                        Riffer rif1 = new Riffer(rec.getDurationInSeconds(), rec, Controller.this);
                         rif1.CreateWindow(waveFilesAbsPath.get(ListOfFiles.getSelectionModel().getSelectedIndex()));
                         rif1.primaryStage.setOnCloseRequest(c -> {
                             rec.close();
-                            rec=null;
-                           System.gc();
+                            rec = null;
+                            System.gc();
                         });
                     }
                 }
@@ -212,14 +222,15 @@ public class Controller {
 
 
     }
+
     private void getListWave(String modify) throws URISyntaxException {
-       waveFiles.clear();
-       waveFilesAbsPath.clear();
-        if(modify.equals("Basic")) {
+        waveFiles.clear();
+        waveFilesAbsPath.clear();
+        if (modify.equals("Basic")) {
             String jarPath = GUIStarter.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
             File jarFile1 = new File(jarPath);
             String wavFolderPath = jarFile1.getParent() + File.separator + "wav";
-           File jarFile = new File(wavFolderPath);
+            File jarFile = new File(wavFolderPath);
             System.out.println(wavFolderPath);
             System.out.println(jarFile.getPath());
             File[] listOfFiles = jarFile.listFiles();
@@ -229,9 +240,9 @@ public class Controller {
                     waveFilesAbsPath.add(listOfFiles[i].getAbsolutePath());
                 }
             }
-            }
-        if(modify.equals("Custom")) {
-          File selectedDirectory = directoryChooser.showDialog(myPane.getScene().getWindow());
+        }
+        if (modify.equals("Custom")) {
+            File selectedDirectory = directoryChooser.showDialog(myPane.getScene().getWindow());
 
             File[] listOfFiles = selectedDirectory.listFiles();
             for (int i = 0; i < listOfFiles.length; i++) {
@@ -241,6 +252,7 @@ public class Controller {
         }
         ListOfFiles.setItems(waveFiles);
     }
+
     public void pakToWav(boolean reverseBytes, boolean reverseFrames) {
         String currentDir = Paths.get("").toAbsolutePath().toString();
         String rifferPath = Paths.get(currentDir, "riffer2", "Directory9000Converter.exe").toString();
@@ -262,8 +274,8 @@ public class Controller {
         command.add(failedFilesDirectory);
         command.add("--mode");
         command.add("onepass");
-       // command.add("--voice7000converter");
-       // command.add(voiceConverterPath);
+        // command.add("--voice7000converter");
+        // command.add(voiceConverterPath);
 
         command.add("--save-folder-structure");
         command.add("0");
@@ -275,7 +287,6 @@ public class Controller {
         command.add("0");
         command.add("--restore-pauses-limit");
         command.add("0");
-
         if (reverseBytes) {
             command.add("-b");
             command.add("pcm;pcm_12;pcm_16;pcm_24;pcm_32;pcm_44;pcm_48;pcm_96;pcm_s;pcm_12_s;pcm_16_s;pcm_24_s;pcm_32_s;pcm_44_s;pcm_48_s;pcm_96_s;cdda;g711_a;g711_mu;g728_0960;g728_1280;g728_16;g728_40;g7231_5333;g7231_6400;g722_48;g722_56;g722_64;g729_1180;g729_0640;g729_08;g729_08_fr11;imbe;nc_sig;nc48;nc56;nc64;nc72;nc80;nc88;nc96;g7221_16_24;g7221_16_32;g7221_32_24;g7221_32_32;g7221_32_48;srn22_32;srn22_48;srn22_64;srn22s_64;srn22s_96;srn22s_128;srn14s_24;srn14s_32;srn14s_48;gsm;tsp;g719_sig;g719_112;g719_120;g719_128;g719_32;g719_36;g719_40;g719_44;g719_48;g719_52;g719_56;g719_60;g719_64;g719_68;g719_72;g719_76;g719_80;g719_84;g719_88;g719_96;g719_s_64;g719_s_96;g719_s_128;g719_s_192;g719_s_224;g719_s_256;g719_s_sig;g7111_r1_a;g7111_r1_u;g7111_r2a_a;g7111_r2a_u;g7111_r2b_a;g7111_r3_a;g7111_r2b_u;g7111_r3_u;g7111d_r3sm_a;g7111d_r4sm_a;g7111d_r4ssm_a;g7111d_r5ssm_a;g7111d_r3sm_u;g7111d_r4sm_u;g7111d_r4ssm_u;g7111d_r5ssm_u;g718_8_8;g718_8_12;g718_16_8;g718_16_12;g718_16_16;g718_16_24;g718_32_16;g718_32_8;g718_32_12;g718_16_32;g718_32_24;g718_32_28;g718_32_32;g718_32_36;g718_32_40;g718_32_48;g7291_sig;g7291_16_08;g7291_16_12;g7291_16_14;g7291_16_16;g7291_16_18;g7291_16_20;g7291_16_22;g7291_16_24;g7291_16_26;g7291_16_28;g7291_16_30;g7291_16_32;g7291_32_36;g7291_32_40;g7291_32_48;g7291_32_56;g7291_32_64;g7110_a_sig;g7110_u;dm12;dm16;dm32;dm24;g7231navy_6400;lpc;g7111f_16_96_a;g7111f_16_128_a;g7111f_32_112_a;g7111f_32_128_a;g7111f_32_144(80)_a;g7111f_32_144(96)_a;g7111f_32_160_a;g7111f_16_96_u;g7111f_16_128_u;g7111f_32_112_u;g7111f_32_128_u;g7111f_32_144(80)_u;g7111f_32_144(96)_u;g7111f_32_160_u;g722b_64;g722b_80;g722b_96;g722d_16_64;g722d_16_80;g722d_32_80;g722d_32_96;g722d_32_112;g722d_32_128;");
@@ -289,7 +300,6 @@ public class Controller {
             command.add("-f \"\"");
         }
         ProcessBuilder builder = new ProcessBuilder(command);
-
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<?> processFuture = executor.submit(() -> {
             Process process = null;
@@ -325,22 +335,27 @@ public class Controller {
         File jarFile1 = new File(jarPath);
         txtDirPath = jarFile1.getParent() + File.separator + "txt";
     }
-   public void setPB(double value){
-        ProgressBarMainStage.setProgress(value/100);
-   }
-   public void ClearTextArea(){
-        IsxTA.clear();
-   }
-   public void setToTextArea(String tex){
-        IsxTA.appendText(tex);
-   }
 
+    public void setPB(double value) {
+        ProgressBarMainStage.setProgress(value / 100);
+    }
+
+    public void ClearTextArea() {
+        IsxTA.clear();
+    }
+
+    public void setToTextArea(String tex) {
+        IsxTA.appendText(tex);
+    }
+    public void setToEnglishTextArea(String tex) {
+        originalLangTF.appendText(tex);
+    }
     private void addLanguage(String englishName, String russianName) {
         languages.add(englishName);
         languageMap.put(englishName, russianName);
     }
 
-    private void setLanguages(){
+    private void setLanguages() {
         addLanguage("None", "Автоопределение");
         addLanguage("English", "Английский");
         addLanguage("Russian", "Русский");
@@ -438,18 +453,22 @@ public class Controller {
             cbSelectLang.getItems().add(languageMap.get(language));
         }
     }
-    public void setFilter(){
+
+    public void setFilter() {
         for (int i = 2; i < 30; i++) {
             cbSelectDurationFilter.getItems().add(String.valueOf(i));
         }
     }
-    public boolean getServiceMessagesStatus(){
+
+    public boolean getServiceMessagesStatus() {
         return allowServiceMessages.isSelected();
     }
-    public long getDurationFilter(){
+
+    public long getDurationFilter() {
         return Long.parseLong(cbSelectDurationFilter.getValue());
     }
-    private Service<Void> createNewService() {
+
+    private Service<Void> createNewService(boolean isTargetLang) {
         Service<Void> service = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -457,14 +476,20 @@ public class Controller {
                     @Override
                     protected Void call() throws Exception {
                         try {
-                            if (checkForPakPaths()){
-                                pakToWav(allowPakReverseBytes.isSelected(), allowPakReverseFrames.isSelected());
-                                waveFilesAbsPath.clear();
-                                getListWave("Basic");
+                            if (isTargetLang) {
+                                if (checkForPakPaths()) {
+                                    pakToWav(allowPakReverseBytes.isSelected(), allowPakReverseFrames.isSelected());
+                                    waveFilesAbsPath.clear();
+                                    getListWave("Basic");
+                                }
+                                StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
+                                SAR.startRec(waveFilesAbsPath, whisperLanguage, whisperDevice, whisperModelSize, allowServiceMessages.isSelected(),
+                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), true);
+                            } else {
+                                StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
+                                SAR.startRec(waveFilesAbsPath, "English", whisperDevice, "small", allowServiceMessages.isSelected(),
+                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), false);
                             }
-                            StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
-                            SAR.startRec(waveFilesAbsPath, whisperLanguage, whisperDevice, whisperModelSize, allowServiceMessages.isSelected(),
-                                    Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected());
                         } catch (UnsupportedAudioFileException e) {
                             throw new RuntimeException(e);
                         } catch (IOException e) {
@@ -483,7 +508,7 @@ public class Controller {
             DecButton.setText("Старт");
             decButtonStopFlag = false;
         });
-        service.setOnCancelled(e->{
+        service.setOnCancelled(e -> {
             DecButton.setText("Старт");
             decButtonStopFlag = false;
         });

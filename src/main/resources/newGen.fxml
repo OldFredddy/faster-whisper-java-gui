@@ -49,7 +49,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbMenu" prefHeight="782.0" prefWidth="883.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
+<VBox fx:id="vbMenu" prefHeight="823.0" prefWidth="1329.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
   <children>
     <MenuBar prefHeight="0.0" prefWidth="883.0" VBox.vgrow="NEVER">
       <menus>
@@ -65,17 +65,17 @@
     </MenuBar>
     <SplitPane fx:id="superParentPane" focusTraversable="true" prefHeight="763.0" prefWidth="883.0" VBox.vgrow="ALWAYS">
       <items>
-        <ScrollPane fx:id="parentPane" prefHeight="607.0" prefWidth="881.0">
+        <ScrollPane fx:id="parentPane" prefHeight="753.0" prefWidth="1327.0">
           <content>
-            <AnchorPane id="Content" fx:id="myPane" minHeight="-1.0" minWidth="-1.0" prefHeight="694.0" prefWidth="879.0">
+            <AnchorPane id="Content" fx:id="myPane" minHeight="-1.0" minWidth="-1.0" prefHeight="793.0" prefWidth="1325.0">
               <children>
-                        <TextArea fx:id="IsxTA" layoutX="437.0" layoutY="38.0" prefHeight="676.0" prefWidth="437.0" text="Сделано в войсковой части 90099" wrapText="true">
+                        <TextArea fx:id="IsxTA" layoutX="437.0" layoutY="65.0" prefHeight="688.0" prefWidth="440.0" text="Сделано в войсковой части 90099" wrapText="true">
                            <font>
                               <Font name="Times New Roman" size="16.0" />
                            </font>
                         </TextArea>
                         <Button fx:id="DecButton" disable="true" layoutX="171.0" layoutY="199.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="Старт" />
-                        <Label fx:id="LabelPervious" layoutX="560.0" prefHeight="41.0" prefWidth="190.0" text="Область предпросмотра">
+                        <Label fx:id="LabelPervious" layoutX="562.0" layoutY="35.0" prefHeight="25.0" prefWidth="190.0" text="Область предпросмотра">
                            <font>
                               <Font name="Times New Roman" size="18.0" />
                            </font>
@@ -85,8 +85,8 @@
                               <Font name="Times New Roman" size="18.0" />
                            </font>
                         </CheckBox>
-                        <ProgressBar fx:id="ProgressBarMainStage" layoutX="2.0" layoutY="715.0" prefHeight="37.0" prefWidth="877.0" progress="0.0" />
-                        <ListView fx:id="ListOfFiles" layoutX="3.0" layoutY="245.0" prefHeight="469.0" prefWidth="432.0" />
+                        <ProgressBar fx:id="ProgressBarMainStage" layoutX="2.0" layoutY="756.0" prefHeight="37.0" prefWidth="1318.0" progress="0.0" />
+                        <ListView fx:id="ListOfFiles" layoutX="3.0" layoutY="246.0" prefHeight="507.0" prefWidth="432.0" />
                         <ProgressIndicator fx:id="ProgressBarInd1" layoutX="290.0" layoutY="38.0" progress="0.0" visible="false" />
                         <Button fx:id="StopButton1" layoutX="217.0" layoutY="166.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="114.0" text="Принудительное завершение" textAlignment="CENTER" visible="false" wrapText="true" />
                         <Button fx:id="RefreshButton" graphicTextGap="1.0" layoutX="17.0" layoutY="206.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="111.0" text="Обновить каталог" wrapText="true">
@@ -143,6 +143,21 @@
                               <Font size="16.0" />
                            </font>
                         </CheckBox>
+                        <CheckBox fx:id="saveOriginalFlag" layoutX="439.0" layoutY="4.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="269.0" text="Сохранять текст на английском" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <TextArea fx:id="originalLangTF" layoutX="880.0" layoutY="65.0" prefHeight="688.0" prefWidth="440.0" wrapText="true">
+                           <font>
+                              <Font name="Times New Roman" size="16.0" />
+                           </font>
+                        </TextArea>
+                        <Label fx:id="LabelPervious3" layoutX="1017.0" layoutY="35.0" prefHeight="25.0" prefWidth="167.0" text="Текст на английском">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </Label>
               </children>
             </AnchorPane>
           </content>
