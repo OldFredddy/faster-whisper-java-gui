@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -345,10 +346,14 @@ public class Controller {
     }
 
     public void setToTextArea(String tex) {
-        IsxTA.appendText(tex);
+        Platform.runLater(() -> {
+            IsxTA.appendText(tex);
+        });
     }
     public void setToEnglishTextArea(String tex) {
-        originalLangTF.appendText(tex);
+        Platform.runLater(() -> {
+            originalLangTF.appendText(tex);
+        });
     }
     private void addLanguage(String englishName, String russianName) {
         languages.add(englishName);
@@ -487,7 +492,7 @@ public class Controller {
                                         Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), true);
                             } else {
                                 StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
-                                SAR.startRec(waveFilesAbsPath, "English", whisperDevice, "small", allowServiceMessages.isSelected(),
+                                SAR.startRec(waveFilesAbsPath, "Russian", whisperDevice, "small", allowServiceMessages.isSelected(),
                                         Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), false);
                             }
                         } catch (UnsupportedAudioFileException e) {

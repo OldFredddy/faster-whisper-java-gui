@@ -33,16 +33,20 @@ public class StartAutoRecognize
     }
     public void CreateTxtWithText(List<String> temp, String nameFile, boolean allowCopyWav, boolean isTargetLang, String language) {
         try {
+            try{
             if (temp.get(0).equals("Файл меньше заданного фильтра длительности!") ||
                     temp.get(0).equals("File can't be created.") || temp.get(0).equals("Пропуск файла, превышен timeout ожидания")) {
                 contr.setToTextArea(temp.get(0));
+                return;
+            }
+            } catch (IndexOutOfBoundsException e){
                 return;
             }
             Path name = Paths.get(nameFile);
             nameFile = name.getFileName().toString();
 
             // Определение суффикса на основе выбранного языка или использование _en для английского
-            String languageSuffix = isTargetLang ? "_" + language.toLowerCase() : "_en"; // Предполагается, что метод contr.getLanguage() возвращает код выбранного языка
+            String languageSuffix = isTargetLang ? "_" + language.toLowerCase() : "_russian"; // Предполагается, что метод contr.getLanguage() возвращает код выбранного языка
             // Изменение имени файла для включения суффикса языка
             String fileNameWithLanguage = nameFile.substring(0, nameFile.lastIndexOf('.')) + languageSuffix + ".txt";
 

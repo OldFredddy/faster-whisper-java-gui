@@ -43,8 +43,14 @@ public class Whisper {
         Process[] processHolder = new Process[1];
         Future<?> processFuture = executor.submit(() -> {
             try {
-                ProcessBuilder builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model, "--device=" + device,
-                        "--language=" + language, "--output_dir", tempDirPath, "--beep_off");
+                ProcessBuilder builder;
+               if (device.equals("gpu")){
+                    builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model,
+                           "--language=" + language, "--output_dir", tempDirPath, "--beep_off");
+               } else {
+                    builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model, "--device=" + device,
+                           "--language=" + language, "--output_dir", tempDirPath, "--beep_off");
+               }
                 processHolder[0] = builder.start();
                 processOutput(processHolder[0], durationInSec, controller, allowServiceMessages, isTargetLang);
                 processHolder[0].waitFor();
