@@ -5,10 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.concurrent.Executors;
@@ -18,11 +15,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class Whisper {
-    public static String recognize(long durationInSec, Controller controller, String pathToFile,
+    public static boolean recognize(long durationInSec, Controller controller, String pathToFile,
                                    String language, String model, String device, File file,
-                                   boolean allowServiceMessages, boolean isTargetLang) throws IOException, InterruptedException {
+                                   boolean allowServiceMessages, boolean isTargetLang, boolean allowDirPipeline) throws IOException, InterruptedException {
         controller.setPB(0);
-        String namefile = file.getName();
         if (isTargetLang) {
             controller.setToTextArea("\nОбработка файла:\n" + file.getName());
         } else {
@@ -30,13 +26,11 @@ public class Whisper {
         }
         String currentDir = Paths.get("").toAbsolutePath().toString();
         String whisperPath = Paths.get(currentDir, "whisper", "whisper-faster.exe").toString();
-
-        // Определение суффикса и пути для временной директории
-        String languageSuffix = isTargetLang ? "_" + language.toLowerCase() : "_en";
         String tempDirPath = currentDir + "/txt/";
+        String wavesDirPath = currentDir + "/wav/";
         File tempDir = new File(tempDirPath);
         if (!tempDir.exists()) {
-            tempDir.mkdirs(); // Создаем временную директорию, если не существует
+            tempDir.mkdirs();
         }
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Process[] processHolder = new Process[1];
@@ -44,11 +38,22 @@ public class Whisper {
             try {
                 ProcessBuilder builder;
                if (device.equals("gpu")){
-                    builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model,
-                           "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
+                   if (allowDirPipeline){
+                       builder = new ProcessBuilder(whisperPath, wavesDirPath, "--model=" + model,
+                               "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
+                   } else {
+                       builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model,
+                               "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
+                   }
+
                } else {
-                    builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model, "--device=" + device,
-                           "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
+                   if (allowDirPipeline){
+                       builder = new ProcessBuilder(whisperPath, wavesDirPath, "--model=" + model, "--device=" + device,
+                               "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
+                   } else {
+                       builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model, "--device=" + device,
+                               "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
+                   }
                }
                 processHolder[0] = builder.start();
                 processOutput(processHolder[0], durationInSec, controller, allowServiceMessages, isTargetLang);
@@ -62,31 +67,18 @@ public class Whisper {
 
         try {
             processFuture.get(10, TimeUnit.MINUTES);
-            // После завершения процесса, ищем .srt файл во временной директории
-            File[] files = tempDir.listFiles((dir, name) -> name.endsWith(".srt"));
-            if (files != null && files.length > 0) {
-                File srtFile = files[0]; // Предполагаем, что есть только один .srt файл
-                Path targetPath = Paths.get(currentDir, "whisper", namefile.replace(".wav", "") + languageSuffix + ".srt");
-                Files.move(srtFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-                return targetPath.toString();
-            } else {
-                controller.setToTextArea("File can't be created or not found.");
-                return "File can't be created or not found.";
-            }
+            renameTxtFile(file, pathToFile, tempDirPath);
+            return true;
         } catch (TimeoutException e) {
             processHolder[0].destroyForcibly(); // Уничтожаем процесс при таймауте
             controller.setToTextArea("Процесс прерван из-за истечения времени ожидания");
-            return "Процесс прерван из-за истечения времени ожидания";
+            return false;
         } catch (Exception e) {
             e.printStackTrace();
-            return "Произошла ошибка";
+            return false;
         } finally {
             executor.shutdownNow();
-            // Очистка временной директории
-            for (File f : tempDir.listFiles()) {
-                f.delete();
-            }
-            tempDir.delete();
+
         }
     }
 
@@ -133,6 +125,46 @@ public class Whisper {
                     }
                 }
             }
+        }
+    }
+    /**
+     * Переименовывает текстовый файл, соответствующий временному файлу, в исходное имя файла.
+     * @param originalFile Путь к исходному файлу.
+     * @param tempFilePath Путь к временному файлу.
+     * @param txtDirPath Путь к директории с текстовыми файлами.
+     */
+    public static void renameTxtFile(File originalFile, String tempFilePath, String txtDirPath) {
+        // Получаем имя временного файла без расширения
+        String baseName = Paths.get(tempFilePath).getFileName().toString();
+        int dotIndex = baseName.lastIndexOf('.');
+        if (dotIndex != -1) {
+            baseName = baseName.substring(0, dotIndex);
+        }
+
+        Path tempDirPath = Paths.get(txtDirPath);
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(tempDirPath, baseName + "*.txt")) {
+            for (Path entry : stream) {
+                // Найденный файл с расширением .txt, соответствующий baseName
+                File foundTxtFile = entry.toFile();
+                // Новое имя файла, основанное на оригинальном имени файла с расширением .txt
+                String newFileName = originalFile.getName();
+                if (newFileName.contains(".")) {
+                    newFileName = newFileName.substring(0, newFileName.lastIndexOf('.')) + ".txt";
+                } else {
+                    newFileName += ".txt"; // На случай, если в оригинальном имени файла нет расширения
+                }
+
+                File newFile = new File(tempDirPath.toFile(), newFileName);
+                if (foundTxtFile.renameTo(newFile)) {
+                    System.out.println("Файл успешно переименован в: " + newFile.getName());
+                } else {
+                    System.out.println("Не удалось переименовать файл.");
+                }
+                break; // Предполагаем, что только один файл соответствует критериям
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

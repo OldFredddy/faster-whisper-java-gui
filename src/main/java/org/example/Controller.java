@@ -111,6 +111,8 @@ public class Controller {
     private CheckBox allowServiceMessages;
     @FXML
     private CheckBox allowCopyFile;
+    @FXML
+    private CheckBox allowDirPipeline;
     public String whisperLanguage;
     public String whisperDevice;
     public String whisperModelSize;
@@ -180,11 +182,11 @@ public class Controller {
         });
         DecButton.setOnAction(event -> {
             if (!decButtonStopFlag) {
-                service2 = createNewService(true); // Метод для создания нового сервиса
+                service2 = createNewService(true, allowDirPipeline.isSelected()); // Метод для создания нового сервиса
                 service2.start();
                 IsxTA.clear();
                 if (saveOriginalFlag.isSelected()) {
-                    service3 = createNewService(false); // Метод для создания нового сервиса
+                    service3 = createNewService(false, allowDirPipeline.isSelected()); // Метод для создания нового сервиса
                     service3.start();
                     originalLangTF.clear();
                 }
@@ -473,7 +475,7 @@ public class Controller {
         return Long.parseLong(cbSelectDurationFilter.getValue());
     }
 
-    private Service<Void> createNewService(boolean isTargetLang) {
+    private Service<Void> createNewService(boolean isTargetLang, boolean _allowDirPipeline) {
         Service<Void> service = new Service<Void>() {
             @Override
             protected Task<Void> createTask() {
@@ -489,11 +491,11 @@ public class Controller {
                                 }
                                 StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
                                 SAR.startRec(waveFilesAbsPath, whisperLanguage, whisperDevice, whisperModelSize, allowServiceMessages.isSelected(),
-                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), true);
+                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), true, _allowDirPipeline);
                             } else {
                                 StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
                                 SAR.startRec(waveFilesAbsPath, "Russian", whisperDevice, "small", allowServiceMessages.isSelected(),
-                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), false);
+                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), false,_allowDirPipeline);
                             }
                         } catch (UnsupportedAudioFileException e) {
                             throw new RuntimeException(e);

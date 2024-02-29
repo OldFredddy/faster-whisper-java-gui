@@ -49,7 +49,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbMenu" prefHeight="823.0" prefWidth="1329.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
+<VBox fx:id="vbMenu" prefHeight="825.0" prefWidth="1330.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
   <children>
     <MenuBar prefHeight="0.0" prefWidth="883.0" VBox.vgrow="NEVER">
       <menus>
@@ -65,7 +65,7 @@
     </MenuBar>
     <SplitPane fx:id="superParentPane" focusTraversable="true" prefHeight="763.0" prefWidth="883.0" VBox.vgrow="ALWAYS">
       <items>
-        <ScrollPane fx:id="parentPane" prefHeight="753.0" prefWidth="1327.0">
+        <ScrollPane fx:id="parentPane" prefHeight="794.0" prefWidth="1333.0">
           <content>
             <AnchorPane id="Content" fx:id="myPane" minHeight="-1.0" minWidth="-1.0" prefHeight="793.0" prefWidth="1325.0">
               <children>
@@ -158,6 +158,11 @@
                               <Font name="Times New Roman" size="18.0" />
                            </font>
                         </Label>
+                        <CheckBox fx:id="allowDirPipeline" layoutX="710.0" layoutY="6.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="493.0" text="Подать файлы пачкой (ВОЗМОЖНА НЕСТАБИЛЬНАЯ РАБОТА)" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
               </children>
             </AnchorPane>
           </content>

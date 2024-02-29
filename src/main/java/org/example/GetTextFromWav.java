@@ -30,7 +30,7 @@ public static double progress;
     GetTextFromWav(Controller contr){
         this.contr=contr;
     }
-    public List<String>startWhisper(Path pathToFile, String device, String model,
+    public boolean startWhisper(Path pathToFile, String device, String model,
                                     String language, boolean allowServiceMessages,
                                     long filterLength, boolean isTargetLang) throws UnsupportedAudioFileException, IOException, InterruptedException {
         uuid = UUID.randomUUID();
@@ -46,7 +46,7 @@ public static double progress;
         if (t2<filterLength){
             List<String> temp = new ArrayList<>();
                     temp.add("Файл меньше заданного фильтра длительности!");
-            return temp;
+            return false;
         }
         WavCutter wavCutter = new WavCutter(0, t2, file.getAbsolutePath());
         file = wavCutter.cut();
@@ -57,18 +57,10 @@ public static double progress;
             file = new File(newPath);
             pathToFile = Paths.get(newPath);
         }
-        String readyFilePath = Whisper.recognize(t2, contr, pathToFile.toString(),
-                language, model, device, fileForGetFilename, allowServiceMessages, isTargetLang);
-        List<String> temp = readFileLines(readyFilePath);
-        if (readyFilePath.equals("Пропуск файла, превышен timeout ожидания")
-                ||readyFilePath.equals("File can't be created.")){
-            temp.add(readyFilePath);
-            return temp;
-        }
-        File fileForDelete = new File(readyFilePath);
-        fileForDelete.delete();
-        file.delete();
-        return temp;
+        boolean isSuccess = Whisper.recognize(t2, contr, pathToFile.toString(),
+                language, model, device, fileForGetFilename, allowServiceMessages, isTargetLang, false);
+
+        return isSuccess;
     }
 
     public static List<String> readFileLines(String filePath) {
