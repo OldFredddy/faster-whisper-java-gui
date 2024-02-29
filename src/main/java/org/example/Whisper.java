@@ -33,12 +33,11 @@ public class Whisper {
 
         // Определение суффикса и пути для временной директории
         String languageSuffix = isTargetLang ? "_" + language.toLowerCase() : "_en";
-        String tempDirPath = currentDir + "/whisper/temp_" + languageSuffix;
+        String tempDirPath = currentDir + "/txt/";
         File tempDir = new File(tempDirPath);
         if (!tempDir.exists()) {
             tempDir.mkdirs(); // Создаем временную директорию, если не существует
         }
-
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Process[] processHolder = new Process[1];
         Future<?> processFuture = executor.submit(() -> {
@@ -46,10 +45,10 @@ public class Whisper {
                 ProcessBuilder builder;
                if (device.equals("gpu")){
                     builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model,
-                           "--language=" + language, "--output_dir", tempDirPath, "--beep_off");
+                           "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
                } else {
                     builder = new ProcessBuilder(whisperPath, pathToFile, "--model=" + model, "--device=" + device,
-                           "--language=" + language, "--output_dir", tempDirPath, "--beep_off");
+                           "--language=" + language, "--output_dir", tempDirPath,"--output_format=txt", "--beep_off");
                }
                 processHolder[0] = builder.start();
                 processOutput(processHolder[0], durationInSec, controller, allowServiceMessages, isTargetLang);
