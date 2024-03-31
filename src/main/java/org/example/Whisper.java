@@ -19,6 +19,7 @@ public class Whisper {
                                    String language, String model, String device, File file,
                                    boolean allowServiceMessages, boolean isTargetLang, boolean allowDirPipeline) throws IOException, InterruptedException {
         controller.setPB(0);
+        // controller.updateFileStatus(pathToFile, Controller.FileStatus.PROCESSING);
         if (isTargetLang) {
             controller.setToTextArea("\nОбработка файла:\n" + file.getName());
         } else {
@@ -91,14 +92,28 @@ public class Whisper {
         double seconds = Double.parseDouble(parts[1]);
         return minutes * 60 + seconds;
     }
+    static Pattern startPattern = Pattern.compile("Starting transcription on: (.+)");
+    static Pattern endPattern = Pattern.compile("Subtitles are written to '(.+)' directory.");
+
 
     private static void processOutput(Process process, long durationInSec, Controller controller,
                                       boolean allowServiceMessages, boolean isTargetLang) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
+            String filePath = "";
             Pattern timePattern = Pattern.compile("\\[(\\d{2}:\\d{2}\\.\\d{3}) --> ");
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
+                if (startPattern.matcher(line).matches()) {
+                    Matcher matcher = startPattern.matcher(line);
+                    if (matcher.find()) {
+                         filePath = matcher.group(1);
+                        controller.updateFileStatus(filePath, Controller.FileStatus.PROCESSING);
+                    }
+                }
+                if (endPattern.matcher(line).matches()) {
+                    controller.updateFileStatus(filePath, Controller.FileStatus.PROCESSED); // Предполагая, что filePath ещё доступен
+                }
                 Matcher matcher = timePattern.matcher(line);
                 if (matcher.find()) {
                     String time = matcher.group(1);

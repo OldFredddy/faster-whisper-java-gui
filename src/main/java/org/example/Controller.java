@@ -29,6 +29,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
@@ -39,7 +40,13 @@ public class Controller {
     public static List<String> waveFilesAbsPath = new ArrayList<String>();
     FileChooser fileChooser = new FileChooser();
     DirectoryChooser directoryChooser = new DirectoryChooser();
+    public enum FileStatus {
+        UNPROCESSED,
+        PROCESSING,
+        PROCESSED
+    }
 
+    public Map<String, FileStatus> fileStatusMap = new ConcurrentHashMap<>();
     public static String txtDirPath;
     public String startPath;
     public static double ProgressBarValue;
@@ -220,6 +227,36 @@ public class Controller {
                     }
                 }
 
+            }
+        });
+
+        ListOfFiles.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    String absPath = waveFilesAbsPath.get(getIndex());
+                    String normalizedPath = Paths.get(absPath).toString();
+                    FileStatus status = fileStatusMap.getOrDefault(normalizedPath, FileStatus.UNPROCESSED);
+
+                    // Установка цвета текста и статуса
+                    switch (status) {
+                        case PROCESSING:
+                            setTextFill(Color.CYAN);
+                            setText(item + " 🔄");
+                            break;
+                        case PROCESSED:
+                            setTextFill(Color.LIME);
+                            setText(item + " ✅");
+                            break;
+                        default:
+                            setTextFill(Color.LIGHTGRAY);
+                            setText(item);
+                            break;
+                    }
+                }
             }
         });
 
@@ -533,6 +570,14 @@ public class Controller {
             return false;
         }
     }
+    public void updateFileStatus(String filePath, FileStatus status) {
+        String normalizedPath = Paths.get(filePath).toString();
+        fileStatusMap.put(normalizedPath, status);
+
+        Platform.runLater(() -> ListOfFiles.refresh());
+    }
+
+
 
 }
 
