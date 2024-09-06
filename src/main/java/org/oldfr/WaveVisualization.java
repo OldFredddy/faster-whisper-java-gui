@@ -1,9 +1,9 @@
 /*
  * 
  */
-package org.example;
+package org.oldfr;
 
-import org.example.WaveFormService.WaveFormJob;
+import org.oldfr.WaveFormService.WaveFormJob;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.SimpleBooleanProperty;
 

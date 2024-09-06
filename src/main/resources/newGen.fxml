@@ -50,7 +50,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbMenu" prefHeight="912.0" prefWidth="1330.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
+<VBox fx:id="vbMenu" prefHeight="912.0" prefWidth="1330.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.oldfr.Controller">
   <children>
     <MenuBar prefHeight="0.0" prefWidth="883.0" VBox.vgrow="NEVER">
       <menus>

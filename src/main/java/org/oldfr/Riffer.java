@@ -1,12 +1,8 @@
-package org.example;
+package org.oldfr;
 
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-
-import java.io.File;
 
 public class Riffer {
     private Controller contr;

@@ -1,4 +1,4 @@
-package org.example;
+package org.oldfr;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;

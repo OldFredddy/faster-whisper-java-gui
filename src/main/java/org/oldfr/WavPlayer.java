@@ -1,4 +1,4 @@
-package org.example;
+package org.oldfr;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaPlayer.Status;
@@ -7,7 +7,6 @@ import javafx.util.Duration;
 import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class WavPlayer {
     private Media media;

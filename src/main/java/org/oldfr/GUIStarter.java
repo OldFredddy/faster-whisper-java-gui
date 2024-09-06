@@ -1,4 +1,4 @@
-package org.example;
+package org.oldfr;
 public class GUIStarter {
 
     public static void main( String[] args) {

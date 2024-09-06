@@ -1,4 +1,4 @@
-package org.example;
+package org.oldfr;
 
 import javax.sound.sampled.*;
 import java.io.ByteArrayInputStream;
