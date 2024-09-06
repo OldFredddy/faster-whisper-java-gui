@@ -1,59 +1,82 @@
 package org.example;
 
-import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.*;
+import java.net.URISyntaxException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-public class Whisper {
+public class WhisperX {
     public static boolean recognize(long durationInSec, Controller controller, String pathToFile,
-                                   String language, String model, String device, File file,
-                                   boolean allowServiceMessages, boolean isTargetLang, boolean allowDirPipeline,
-                                    String beam_size, String maxWordsInRow) throws IOException, InterruptedException {
+                                    String language, String model, String device, File file,
+                                    boolean allowServiceMessages, boolean isTargetLang, boolean allowDirPipeline,
+                                    String beam_size, String maxWordsInRow) throws IOException, InterruptedException, URISyntaxException {
         controller.setPB(0);
-        // controller.updateFileStatus(pathToFile, Controller.FileStatus.PROCESSING);
         if (isTargetLang) {
             controller.setToTextArea("\nОбработка файла:\n" + file.getName());
         } else {
             controller.setToEnglishTextArea("\nОбработка файла:\n" + file.getName());
         }
-        String currentDir = Paths.get("").toAbsolutePath().toString();
-        String whisperPath = Paths.get(currentDir, "whisper", "whisper-faster.exe").toString();
-        String tempDirPath = currentDir + "/txt/";
-        String wavesDirPath = currentDir + "/wav/";
+        controller.setToTextArea("\nВнимание в области предпросмотра не будет текста!\n" + "\nКонтролируйте обработку по загрузке процессора и выводу сообщений!\n");
+        String jarPath = new File(WhisperX.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+        String pythonExecutablePath = Paths.get(jarPath, "whisperX", "venv", "Scripts", "python.exe").toString();
+        String mainScriptPath = Paths.get(jarPath, "whisperX", "whisperX", "__main__.py").toString();
+        String tempDirPath = Paths.get(jarPath, "txt").toString();
+
+        List<String> command = new ArrayList<>();
+        command.add(pythonExecutablePath);
+        command.add(mainScriptPath);
+        command.addAll(controller.waveFilesAbsPath);
+        command.add("--model=" + model);
+        command.add("--language=" + language);
+        command.add("--output_dir=" + tempDirPath);
+        command.add("--output_format=vtt");
+        if (device.equals("gpu")){
+            command.add("--device="+"cuda");
+        } else {
+            command.add("--device="+device);
+        }
+
+        command.add("--diarize");
+        if (device.equals("cpu")){
+            command.add("--compute_type=float32");
+        }
+
+        command.add("--hf_token=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");
+      //  command.add("--highlight_words True");
+        command.add("--print_progress=True");
+
         File tempDir = new File(tempDirPath);
         if (!tempDir.exists()) {
             tempDir.mkdirs();
         }
+
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Process[] processHolder = new Process[1];
         Future<?> processFuture = executor.submit(() -> {
             try {
-                ProcessBuilder builder = null;
-                if (device.equals("gpu")) {
-                    if (allowDirPipeline) {
-                        builder = new ProcessBuilder(whisperPath, wavesDirPath, "--model=" + model,
-                                "--language=" + language, "--output_dir", tempDirPath, "--output_format=txt", "--beep_off",
-                                "--beam_size=" + beam_size);
-                    }
-                } else {
-                    if (allowDirPipeline) {
-                        builder = new ProcessBuilder(whisperPath, wavesDirPath, "--model=" + model, "--device=" + device,
-                                "--language=" + language, "--output_dir", tempDirPath, "--output_format=txt", "--beep_off",
-                                "--beam_size=" + beam_size);
+                ProcessBuilder builder = new ProcessBuilder(command);
+                builder.redirectErrorStream(true); // Объединяем потоки вывода и ошибок
+                processHolder[0] = builder.start();
+
+                // Чтение вывода
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(processHolder[0].getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        System.out.println(line); // Выводим строки в консоль
+                        controller.setToTextArea(line);
                     }
                 }
-                processHolder[0] = builder.start();
-                processOutput(processHolder[0], durationInSec, controller, allowServiceMessages, isTargetLang);
+
                 processHolder[0].waitFor();
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
@@ -64,7 +87,6 @@ public class Whisper {
 
         try {
             processFuture.get(10000, TimeUnit.MINUTES);
-            renameTxtFile(file, pathToFile, tempDirPath);
             return true;
         } catch (TimeoutException e) {
             processHolder[0].destroyForcibly(); // Уничтожаем процесс при таймауте
@@ -75,7 +97,6 @@ public class Whisper {
             return false;
         } finally {
             executor.shutdownNow();
-
         }
     }
 
@@ -88,7 +109,7 @@ public class Whisper {
         double seconds = Double.parseDouble(parts[1]);
         return minutes * 60 + seconds;
     }
-    static Pattern startPattern = Pattern.compile("Starting work on: (.+)");
+    static Pattern startPattern = Pattern.compile("Starting transcription on: (.+)");
     static Pattern endPattern = Pattern.compile("Subtitles are written to '(.+)' directory.");
 
 
@@ -96,32 +117,47 @@ public class Whisper {
                                       boolean allowServiceMessages, boolean isTargetLang) throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
             String line;
-            String filePath = "";
-            Pattern timePattern = Pattern.compile("\\[(\\d{2}:\\d{2}\\.\\d{3}) --> ");
+            String currentFilePath = "";
+            Pattern progressPattern = Pattern.compile("Progress: (\\d+\\.\\d+)%");
+            Pattern fileStartPattern = Pattern.compile(">>Performing transcription...");
+            Pattern fileEndPattern = Pattern.compile(">>Performing (.+)");
+
+            // Индекс текущего файла в списке
+            int currentFileIndex = 0;
+
             while ((line = reader.readLine()) != null) {
                 System.out.println(line);
 
-                Matcher startMatcher = startPattern.matcher(line);
-                if (startMatcher.matches()) {
-                    filePath = Paths.get(startMatcher.group(1)).normalize().toAbsolutePath().toString();
-                    controller.updateFileStatus(filePath, Controller.FileStatus.PROCESSING);
-                }
-
-                Matcher endMatcher = endPattern.matcher(line);
-                if (endMatcher.matches()) {
-                    controller.updateFileStatus(filePath, Controller.FileStatus.PROCESSED);
-                }
-
-                Matcher timeMatcher = timePattern.matcher(line);
-                if (timeMatcher.find()) {
-                    String time = timeMatcher.group(1);
-                    double currentTimeInSeconds = convertTimeToSeconds(time);
-                    double progress = (currentTimeInSeconds / durationInSec) * 100;
-                    if (isTargetLang) {
-                        controller.setPB(progress);
+                // Обработка начала обработки файла
+                Matcher startMatcher = fileStartPattern.matcher(line);
+                if (startMatcher.find()) {
+                    if (currentFileIndex < controller.waveFilesAbsPath.size()) {
+                        currentFilePath = controller.waveFilesAbsPath.get(currentFileIndex++);
+                        controller.updateFileStatus(currentFilePath, Controller.FileStatus.PROCESSING);
                     }
                 }
 
+                // Обновление прогресса по строкам "Progress: X%"
+                Matcher progressMatcher = progressPattern.matcher(line);
+                if (progressMatcher.find()) {
+                    double progress = Double.parseDouble(progressMatcher.group(1));
+                    controller.setPB(progress);
+                    if (progress == 100.0 && !currentFilePath.isEmpty()) {
+                        controller.updateFileStatus(currentFilePath, Controller.FileStatus.PROCESSED);
+                        currentFilePath = "";
+                    }
+                }
+
+                // Обработка конца обработки файла
+                Matcher endMatcher = fileEndPattern.matcher(line);
+                if (endMatcher.find()) {
+                    if (!currentFilePath.isEmpty()) {
+                        controller.updateFileStatus(currentFilePath, Controller.FileStatus.PROCESSED);
+                        currentFilePath = "";
+                    }
+                }
+
+                // Логирование
                 if (allowServiceMessages) {
                     if (isTargetLang) {
                         controller.setToTextArea("\n" + line);
@@ -140,9 +176,6 @@ public class Whisper {
             }
         }
     }
-
-
-
     /**
      * Переименовывает текстовый файл, соответствующий временному файлу, в исходное имя файла.
      * @param originalFile Путь к исходному файлу.

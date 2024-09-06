@@ -6,7 +6,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>s2t_gui</artifactId>
-    <version>3.9</version>
+    <version>4.3</version>
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
@@ -30,6 +30,12 @@
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-base</artifactId>
             <version>${javafx.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.github.axet/TarsosDSP -->
+        <dependency>
+            <groupId>com.github.axet</groupId>
+            <artifactId>TarsosDSP</artifactId>
+            <version>2.4</version>
         </dependency>
 
         <dependency>

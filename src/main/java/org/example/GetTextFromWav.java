@@ -32,7 +32,8 @@ public static double progress;
     }
     public boolean startWhisper(Path pathToFile, String device, String model,
                                     String language, boolean allowServiceMessages,
-                                    long filterLength, boolean isTargetLang) throws UnsupportedAudioFileException, IOException, InterruptedException {
+                                    long filterLength, boolean isTargetLang,
+                                String beam_size, String maxWordsInRow) throws UnsupportedAudioFileException, IOException, InterruptedException {
         uuid = UUID.randomUUID();
         int SampleRate;
         File file = new File(pathToFile.toUri());
@@ -58,7 +59,7 @@ public static double progress;
             pathToFile = Paths.get(newPath);
         }
         boolean isSuccess = Whisper.recognize(t2, contr, pathToFile.toString(),
-                language, model, device, fileForGetFilename, allowServiceMessages, isTargetLang, false);
+                language, model, device, fileForGetFilename, allowServiceMessages, isTargetLang, false, beam_size, maxWordsInRow );
 
         return isSuccess;
     }

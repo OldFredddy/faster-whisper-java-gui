@@ -43,13 +43,14 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbMenu" prefHeight="825.0" prefWidth="1330.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
+<VBox fx:id="vbMenu" prefHeight="912.0" prefWidth="1330.0" stylesheets="@dark-theme.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.Controller">
   <children>
     <MenuBar prefHeight="0.0" prefWidth="883.0" VBox.vgrow="NEVER">
       <menus>
@@ -69,13 +70,13 @@
           <content>
             <AnchorPane id="Content" fx:id="myPane" minHeight="-1.0" minWidth="-1.0" prefHeight="793.0" prefWidth="1325.0">
               <children>
-                        <TextArea fx:id="IsxTA" layoutX="437.0" layoutY="65.0" prefHeight="688.0" prefWidth="440.0" text="Сделано в войсковой части 90099" wrapText="true">
+                        <TextArea fx:id="IsxTA" layoutX="437.0" layoutY="37.0" prefHeight="803.0" prefWidth="440.0" text="Сделано в войсковой части 90099" wrapText="true">
                            <font>
                               <Font name="Times New Roman" size="16.0" />
                            </font>
                         </TextArea>
-                        <Button fx:id="DecButton" disable="true" layoutX="171.0" layoutY="199.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="Старт" />
-                        <Label fx:id="LabelPervious" layoutX="562.0" layoutY="35.0" prefHeight="25.0" prefWidth="190.0" text="Область предпросмотра">
+                        <Button fx:id="DecButton" disable="true" layoutX="173.0" layoutY="239.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="Старт" />
+                        <Label fx:id="LabelPervious" layoutX="562.0" layoutY="6.0" prefHeight="25.0" prefWidth="190.0" text="Область предпросмотра">
                            <font>
                               <Font name="Times New Roman" size="18.0" />
                            </font>
@@ -85,84 +86,133 @@
                               <Font name="Times New Roman" size="18.0" />
                            </font>
                         </CheckBox>
-                        <ProgressBar fx:id="ProgressBarMainStage" layoutX="2.0" layoutY="756.0" prefHeight="37.0" prefWidth="1318.0" progress="0.0" />
-                        <ListView fx:id="ListOfFiles" layoutX="3.0" layoutY="246.0" prefHeight="507.0" prefWidth="432.0" />
+                        <ProgressBar fx:id="ProgressBarMainStage" layoutX="3.0" layoutY="843.0" prefHeight="37.0" prefWidth="1318.0" progress="0.0" />
+                        <ListView fx:id="ListOfFiles" layoutX="3.0" layoutY="289.0" prefHeight="549.0" prefWidth="432.0" />
                         <ProgressIndicator fx:id="ProgressBarInd1" layoutX="290.0" layoutY="38.0" progress="0.0" visible="false" />
                         <Button fx:id="StopButton1" layoutX="217.0" layoutY="166.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="114.0" text="Принудительное завершение" textAlignment="CENTER" visible="false" wrapText="true" />
-                        <Button fx:id="RefreshButton" graphicTextGap="1.0" layoutX="17.0" layoutY="206.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="111.0" text="Обновить каталог" wrapText="true">
+                        <Button fx:id="RefreshButton" graphicTextGap="1.0" layoutX="8.0" layoutY="260.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="111.0" text="Обновить каталог" wrapText="true">
                            <font>
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <ComboBox fx:id="cbSelectLang" layoutX="17.0" layoutY="40.0" prefHeight="25.0" prefWidth="179.0" promptText="Английский" />
-                        <ComboBox fx:id="cbSelectModelSize" layoutX="240.0" layoutY="40.0" prefHeight="25.0" prefWidth="179.0" promptText="small" />
-                        <ComboBox fx:id="cbSelectDevice" layoutX="17.0" layoutY="122.0" prefHeight="25.0" prefWidth="179.0" promptText="cpu" />
-                        <ComboBox fx:id="cbSelectDurationFilter" layoutX="239.0" layoutY="122.0" prefHeight="25.0" prefWidth="179.0" promptText="5" />
+                        <ComboBox fx:id="cbSelectLang" layoutX="17.0" layoutY="117.0" prefHeight="25.0" prefWidth="179.0" promptText="Английский" />
+                        <ComboBox fx:id="cbSelectModelSize" layoutX="240.0" layoutY="117.0" prefHeight="25.0" prefWidth="179.0" promptText="medium" />
+                        <ComboBox fx:id="cbSelectDevice" layoutX="17.0" layoutY="199.0" prefHeight="25.0" prefWidth="179.0" promptText="cpu" />
+                        <ComboBox fx:id="cbSelectDurationFilter" layoutX="239.0" layoutY="199.0" prefHeight="25.0" prefWidth="179.0" promptText="5" />
                         <Button fx:id="setDefaultSettingsButton" graphicTextGap="1.0" layoutX="77.0" layoutY="199.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="set Default Settings" textAlignment="CENTER" visible="false" wrapText="true">
                            <font>
                               <Font size="10.0" />
                            </font>
                         </Button>
-                        <Label fx:id="LabelPervious1" layoutX="234.0" layoutY="66.0" prefHeight="63.0" prefWidth="190.0" text="Фильтровать записи короче чем [секунды]" textAlignment="CENTER" wrapText="true">
+                        <Label fx:id="LabelPervious1" layoutX="234.0" layoutY="143.0" prefHeight="63.0" prefWidth="190.0" text="Фильтровать записи короче чем [секунды]" textAlignment="CENTER" wrapText="true">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Label>
-                        <Label fx:id="LabelPervious2" layoutX="55.0" layoutY="6.0" prefHeight="25.0" prefWidth="106.0" text="Выбор языка">
+                        <Label fx:id="LabelPervious2" layoutX="55.0" layoutY="83.0" prefHeight="25.0" prefWidth="106.0" text="Выбор языка">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Label>
-                        <Label fx:id="LabelPervious21" layoutX="273.0" layoutY="2.0" prefHeight="32.0" prefWidth="115.0" text="Размер модели">
+                        <Label fx:id="LabelPervious21" layoutX="273.0" layoutY="79.0" prefHeight="32.0" prefWidth="115.0" text="Размер модели">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Label>
-                        <Label fx:id="LabelPervious22" layoutX="67.0" layoutY="89.0" prefHeight="25.0" prefWidth="73.0" text="CPU/GPU">
+                        <Label fx:id="LabelPervious22" layoutX="67.0" layoutY="166.0" prefHeight="25.0" prefWidth="73.0" text="CPU/GPU">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </Label>
-                        <CheckBox fx:id="allowServiceMessages" layoutX="287.0" layoutY="193.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="114.0" text="Показывать сервисную информацию в выводе" wrapText="true">
-                           <font>
-                              <Font size="8.0" />
-                           </font>
-                        </CheckBox>
-                        <CheckBox fx:id="allowCopyFile" layoutX="287.0" layoutY="218.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="69.0" text=".wav -&gt; /txt" wrapText="true">
-                           <font>
-                              <Font size="8.0" />
-                           </font>
-                        </CheckBox>
-                        <CheckBox fx:id="allowPakReverseBytes" layoutX="24.0" layoutY="162.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="225.0" text="Реверс байт у .pak файлов" wrapText="true">
+                        <CheckBox fx:id="allowServiceMessages" layoutX="909.0" layoutY="164.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="389.0" text="Показывать сервисную информацию в выводе" wrapText="true">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </CheckBox>
-                        <CheckBox fx:id="allowPakReverseFrames" layoutX="260.0" layoutY="162.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="141.0" text="Реверс кадров" wrapText="true">
+                        <CheckBox fx:id="allowCopyFile" layoutX="909.0" layoutY="115.0" mnemonicParsing="false" prefHeight="44.0" prefWidth="307.0" text="Копировать .wav -&gt; /txt" wrapText="true">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </CheckBox>
-                        <CheckBox fx:id="saveOriginalFlag" layoutX="439.0" layoutY="4.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="269.0" text="Переводить на русский язык" wrapText="true">
+                        <CheckBox fx:id="allowPakReverseBytes" layoutX="909.0" layoutY="202.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="225.0" text="Реверс байт у .pak файлов" wrapText="true">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </CheckBox>
-                        <TextArea fx:id="originalLangTF" layoutX="880.0" layoutY="65.0" prefHeight="688.0" prefWidth="440.0" wrapText="true">
+                        <CheckBox fx:id="allowPakReverseFrames" layoutX="909.0" layoutY="240.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="271.0" text="Реверс кадров у .pak файлов" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="saveOriginalFlag" layoutX="439.0" layoutY="4.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="269.0" text="Переводить на русский язык" visible="false" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <TextArea fx:id="originalLangTF" layoutX="880.0" layoutY="719.0" prefHeight="34.0" prefWidth="47.0" visible="false" wrapText="true">
                            <font>
                               <Font name="Times New Roman" size="16.0" />
                            </font>
                         </TextArea>
-                        <Label fx:id="LabelPervious3" layoutX="1017.0" layoutY="35.0" prefHeight="25.0" prefWidth="189.0" text="Текст на русском языке">
+                        <Label fx:id="LabelPervious3" layoutX="995.0" layoutY="35.0" prefHeight="25.0" prefWidth="225.0" text="Дополнительные параметры">
                            <font>
                               <Font name="Times New Roman" size="18.0" />
                            </font>
                         </Label>
-                        <CheckBox fx:id="allowDirPipeline" layoutX="710.0" layoutY="6.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="493.0" text="Подать файлы пачкой (ВОЗМОЖНА НЕСТАБИЛЬНАЯ РАБОТА)" wrapText="true">
+                        <CheckBox fx:id="allowDirPipeline" disable="true" layoutX="909.0" layoutY="85.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="231.0" selected="true" text="Подать файлы пачкой" wrapText="true">
                            <font>
                               <Font size="16.0" />
                            </font>
                         </CheckBox>
+                        <ComboBox fx:id="cbSelectTranscriber" layoutX="16.0" layoutY="39.0" prefHeight="25.0" prefWidth="179.0" promptText="Faster-whisper" />
+                        <Label fx:id="LabelPervious23" layoutX="43.0" layoutY="5.0" prefHeight="25.0" prefWidth="120.0" text="Транскрибитор">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <ComboBox fx:id="cbSelectDiarization" layoutX="239.0" layoutY="41.0" prefHeight="25.0" prefWidth="179.0" promptText="Нет" />
+                        <Label fx:id="LabelPervious24" layoutX="199.0" layoutY="7.0" prefHeight="25.0" prefWidth="301.0" text="Выделение спикеров (только whisperX)" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <CheckBox fx:id="allowIncreaseAmplitude" layoutX="909.0" layoutY="268.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="406.0" text="Усиление записи и последующее выравнивание амплитуды (для выделения тихого абонента)" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <Slider fx:id="sliderOfAmplitude" layoutX="938.0" layoutY="337.0" max="1.0" prefHeight="14.0" prefWidth="277.0" value="0.8" />
+                        <Label fx:id="labelIncreaseAmplitude" layoutX="1229.0" layoutY="331.0" prefHeight="25.0" prefWidth="53.0" text="0.8">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </Label>
+                        <CheckBox fx:id="allowBeamSize1" layoutX="909.0" layoutY="430.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="406.0" text="beam_size = 1 (ускорение за счет потери качества)" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <CheckBox fx:id="maxWordsInRow" layoutX="909.0" layoutY="473.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="406.0" text="Максимальное количество выдаваемых слов в одной строке" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </CheckBox>
+                        <Slider fx:id="sliderMaxRows" layoutX="938.0" layoutY="542.0" max="80.0" min="1.0" prefHeight="14.0" prefWidth="277.0" value="30.0" />
+                        <Label fx:id="labelMaxWordsInRow" layoutX="1229.0" layoutY="535.0" prefHeight="25.0" prefWidth="53.0" text="default">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="labelMaxWordsInRow1" layoutX="938.0" layoutY="363.0" prefHeight="25.0" prefWidth="307.0" text="1 - установить коэффициент усиления">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="labelMaxWordsInRow11" layoutX="938.0" layoutY="386.0" prefHeight="48.0" prefWidth="361.0" text="2 - нажатие флага запустит процесс и заменит исходный файл" wrapText="true">
+                           <font>
+                              <Font name="Times New Roman" size="18.0" />
+                           </font>
+                        </Label>
               </children>
             </AnchorPane>
           </content>

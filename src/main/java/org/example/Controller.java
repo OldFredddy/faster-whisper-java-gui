@@ -127,13 +127,33 @@ public class Controller {
     private CheckBox saveOriginalFlag;
     @FXML
     private CheckBox allowPakReverseBytes;
-
+    @FXML
+    private Slider sliderMaxRows;
+    @FXML
+    private Slider sliderOfAmplitude;
+    @FXML
+    private ComboBox<String> cbSelectTranscriber;
+    @FXML
+    private Label labelIncreaseAmplitude;
+    @FXML
+    private Label labelMaxWordsInRow;
+    @FXML
+    private CheckBox maxWordsInRow;
+    @FXML
+    private ComboBox<String> cbSelectDiarization;
+    @FXML
+    private CheckBox allowIncreaseAmplitude;
+    @FXML
+    private CheckBox allowBeamSize1;
+    public String beamSize;
+    public String maxWordsInRowForInjection;
     public boolean allowCopyWav;
     private List<String> languages = new ArrayList<>();
     private Map<String, String> languageMap = new HashMap<>();
     private boolean decButtonStopFlag = false;
     private Service<Void> service2;
     private Service<Void> service3;
+    private double gainFactor = 0.8;
 
     @FXML
     void initialize() throws IOException, URISyntaxException {
@@ -150,11 +170,45 @@ public class Controller {
         cbSelectModelSize.getItems().add("small");
         cbSelectModelSize.getItems().add("base");
         cbSelectModelSize.getItems().add("tiny");
+        cbSelectDiarization.getItems().add("Да");
+        cbSelectDiarization.getItems().add("Нет");
+        cbSelectDiarization.setValue("Нет");
+        cbSelectTranscriber.getItems().add("Faster-whisper");
+        cbSelectTranscriber.getItems().add("WhisperX");
+        cbSelectTranscriber.getItems().add("NeMo");
+        labelIncreaseAmplitude.setText("30");
         cbSelectDurationFilter.setValue("5");
+        labelMaxWordsInRow.setText("80");
+        maxWordsInRowForInjection = "80";
+        sliderMaxRows.setValue(80);
+        beamSize = "5";
         whisperDevice = "cpu";
-        whisperModelSize = "small";
-        allowServiceMessages.setSelected(false);
+        whisperModelSize = "medium";
 
+        cbSelectTranscriber.setValue("Faster-whisper");
+        cbSelectTranscriber.setOnAction(e->{
+            if (cbSelectTranscriber.getValue().equals("NeMo")){
+                cbSelectTranscriber.setValue("Faster-whisper");
+            }
+        });
+        allowServiceMessages.setSelected(false);
+        sliderMaxRows.setOnMouseDragged(e -> {
+            int tempMaxRows = (int) sliderMaxRows.getValue();
+            labelMaxWordsInRow.setText(String.valueOf(tempMaxRows));
+            maxWordsInRowForInjection = String.valueOf(tempMaxRows);
+        });
+        sliderOfAmplitude.setOnMouseDragged(e -> {
+            double tempMaxRows = Math.round(sliderOfAmplitude.getValue() * 10.0) / 10.0;
+            labelIncreaseAmplitude.setText(String.valueOf(tempMaxRows));
+            gainFactor = tempMaxRows;
+        });
+        allowBeamSize1.setOnAction(e ->{
+            if (allowBeamSize1.isSelected()){
+                beamSize = "1";
+            } else {
+                beamSize = "5";
+            }
+        });
         whisperLanguage = languageMap.entrySet().stream()
                 .filter(entry -> "Автоопределение".equals(entry.getValue()))
                 .map(Map.Entry::getKey)
@@ -166,6 +220,7 @@ public class Controller {
                     .map(Map.Entry::getKey)
                     .findFirst().orElse(null);
         });
+        whisperLanguage = "English";
         cbSelectDevice.setOnAction(e -> {
             whisperDevice = cbSelectDevice.getValue();
             DecButton.setDisable(false);
@@ -183,22 +238,30 @@ public class Controller {
         setDefaultSettingsButton.setOnAction(e -> {
             cbSelectDevice.setValue("cpu");
             cbSelectLang.setValue("Английский");
-            cbSelectModelSize.setValue("small");
+            cbSelectModelSize.setValue("medium");
             cbSelectDurationFilter.setValue("5");
             DecButton.setDisable(false);
         });
         DecButton.setOnAction(event -> {
             if (!decButtonStopFlag) {
-                service2 = createNewService(true, allowDirPipeline.isSelected()); // Метод для создания нового сервиса
+                service2 = createNewService(true, allowDirPipeline.isSelected());
                 service2.start();
                 IsxTA.clear();
                 if (saveOriginalFlag.isSelected()) {
-                    service3 = createNewService(false, allowDirPipeline.isSelected()); // Метод для создания нового сервиса
+                    service3 = createNewService(false, allowDirPipeline.isSelected());
                     service3.start();
                     originalLangTF.clear();
                 }
             } else {
                 service2.cancel();
+                try {
+                    // Завершаем процесс whisper-faster.exe
+                    Process process = Runtime.getRuntime().exec("taskkill /F /IM whisper-faster.exe");
+                    process.waitFor();
+                } catch (IOException | InterruptedException e) {
+                    e.printStackTrace();
+                    decButtonStopFlag=!decButtonStopFlag;
+                }
             }
         });
 
@@ -237,8 +300,8 @@ public class Controller {
                 if (empty || item == null) {
                     setText(null);
                 } else {
-                    String absPath = waveFilesAbsPath.get(getIndex());
-                    String normalizedPath = Paths.get(absPath).toString();
+                    String absPath = waveFilesAbsPath.get(getIndex()).toString();
+                    String normalizedPath = Paths.get(absPath).normalize().getFileName().toString();
                     FileStatus status = fileStatusMap.getOrDefault(normalizedPath, FileStatus.UNPROCESSED);
 
                     // Установка цвета текста и статуса
@@ -259,6 +322,21 @@ public class Controller {
                 }
             }
         });
+        allowIncreaseAmplitude.setOnAction(e -> {
+            if (allowIncreaseAmplitude.isSelected()) {
+                try {
+                    String jarPath = new File(Controller.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getParent();
+                    File wavDirectory = new File(jarPath, "wav");
+                    if (wavDirectory.exists() && wavDirectory.isDirectory()) {
+                        AudioNormalizer.normalizeDirectory(wavDirectory.getAbsolutePath(), gainFactor);
+                    } else {
+                        System.out.println("Directory 'wav' not found in the JAR location.");
+                    }
+                } catch (URISyntaxException | IOException | UnsupportedAudioFileException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
 
 
     }
@@ -275,10 +353,10 @@ public class Controller {
             System.out.println(jarFile.getPath());
             File[] listOfFiles = jarFile.listFiles();
             for (int i = 0; i < listOfFiles.length; i++) {
-                if (listOfFiles[i].getName().endsWith(".wav")) {
+
                     waveFiles.add(listOfFiles[i].getName());
                     waveFilesAbsPath.add(listOfFiles[i].getAbsolutePath());
-                }
+
             }
         }
         if (modify.equals("Custom")) {
@@ -528,11 +606,13 @@ public class Controller {
                                 }
                                 StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
                                 SAR.startRec(waveFilesAbsPath, whisperLanguage, whisperDevice, whisperModelSize, allowServiceMessages.isSelected(),
-                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), true, _allowDirPipeline);
+                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), true, _allowDirPipeline,
+                                        cbSelectTranscriber.getValue(), beamSize, maxWordsInRowForInjection);
                             } else {
                                 StartAutoRecognize SAR = new StartAutoRecognize(Controller.this);
                                 SAR.startRec(waveFilesAbsPath, "Russian", whisperDevice, "small", allowServiceMessages.isSelected(),
-                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), false,_allowDirPipeline);
+                                        Long.parseLong(cbSelectDurationFilter.getValue()), allowCopyFile.isSelected(), false,_allowDirPipeline,
+                                        cbSelectTranscriber.getValue(), beamSize, maxWordsInRowForInjection);
                             }
                         } catch (UnsupportedAudioFileException e) {
                             throw new RuntimeException(e);
@@ -571,11 +651,13 @@ public class Controller {
         }
     }
     public void updateFileStatus(String filePath, FileStatus status) {
-        String normalizedPath = Paths.get(filePath).toString();
+        String normalizedPath = Paths.get(filePath).normalize().getFileName().toString();
+        System.out.println(normalizedPath);
+        System.out.println("PATH IS UP of ME");
         fileStatusMap.put(normalizedPath, status);
-
         Platform.runLater(() -> ListOfFiles.refresh());
     }
+
 
 
 
