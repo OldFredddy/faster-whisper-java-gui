@@ -213,6 +213,11 @@
                               <Font name="Times New Roman" size="18.0" />
                            </font>
                         </Label>
+                        <Button fx:id="detectLanguageButton" layoutX="979.0" layoutY="602.0" mnemonicParsing="false" prefHeight="85.0" prefWidth="225.0" text="Определить языки в /wav и сортировать их" textAlignment="CENTER" wrapText="true">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Button>
               </children>
             </AnchorPane>
           </content>

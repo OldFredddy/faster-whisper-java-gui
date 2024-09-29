@@ -104,6 +104,8 @@ public class Controller {
 
     @FXML
     private ComboBox<String> cbSelectLang;
+    @FXML
+    private Button detectLanguageButton;
 
     @FXML
     private ComboBox<String> cbSelectModelSize;
@@ -335,7 +337,13 @@ public class Controller {
                 }
             }
         });
-
+        detectLanguageButton.setOnAction(event -> {
+            // Запускаем процесс в отдельном потоке
+            new Thread(() -> {
+                LanguageDetector detector = new LanguageDetector(IsxTA);
+                detector.processAllWavFiles();
+            }).start();
+        });
 
     }
 

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.example</groupId>
   <artifactId>s2t_gui</artifactId>
-  <version>4.3</version>
+  <version>4.4</version>
   <build>
     <plugins>
       <plugin>
