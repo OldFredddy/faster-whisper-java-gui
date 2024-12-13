@@ -359,10 +359,8 @@ public class Controller {
             System.out.println(jarFile.getPath());
             File[] listOfFiles = jarFile.listFiles();
             for (int i = 0; i < listOfFiles.length; i++) {
-
                     waveFiles.add(listOfFiles[i].getName());
                     waveFilesAbsPath.add(listOfFiles[i].getAbsolutePath());
-
             }
         }
         if (modify.equals("Custom")) {
